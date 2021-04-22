@@ -3,15 +3,38 @@ syntax = "proto3";
 package caclulator;
 option go_package = "./calculatorpb";
 
+
+message PrimeNumber {
+int32 prime_number = 1;
+}
+
 message SumRequest {
-	int32 first_number = 1;
-	int32 second_number = 2;
+int32 first_number = 1;
+int32 second_number = 2;
 }
 
 message SumResponse {
-	int32 sum_result = 1;
+int32 sum_result = 1;
+}
+
+message PrimeNumberDecompositionRequest {
+PrimeNumber primeNumber = 1;
+}
+
+message PrimeNumberDecompositionResponse {
+int32 prime_number = 1;
+}
+
+message ComputeAverageRequest {
+	int64 primenumber = 1;
+}
+
+message ComputeAverageResponse {
+	double result = 1;
 }
 
 service CalculatorService {
-	rpc Sum(SumRequest) returns (SumResponse) {};
+rpc Sum(SumRequest) returns (SumResponse) {};
+rpc PrimeNumberDecomposition(PrimeNumberDecompositionRequest) returns (stream PrimeNumberDecompositionResponse) {};
+rpc ComputeAverage(stream ComputeAverageRequest) returns (ComputeAverageResponse) {};
 }
