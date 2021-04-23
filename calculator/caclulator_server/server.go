@@ -12,6 +12,30 @@ import (
 
 type server struct{}
 
+func (s *server) FindMaximum(stream calculatorpb.CalculatorService_FindMaximumServer) error {
+	maximum := int64(0)
+
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			log.Fatalf("FindMax Stream failed with error: %v", err)
+		}
+		number := req.PrimeNumber
+		if number > maximum {
+			maximum = number
+			sendErr := stream.Send(&calculatorpb.FindMaximumResponse{
+				MaxNumber: maximum,
+			})
+			if sendErr != nil {
+				log.Fatalf("Failed send data to client: %v", err)
+			}
+		}
+	}
+}
+
 func (s *server) PrimeNumberDecomposition(request *calculatorpb.PrimeNumberDecompositionRequest, stream calculatorpb.CalculatorService_PrimeNumberDecompositionServer) error {
 	log.Printf("Received PrimeNumberDecomposition: %v", request)
 	inputNumber := request.GetPrimeNumber().PrimeNumber

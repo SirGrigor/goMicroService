@@ -68,6 +68,47 @@ func doAverageCalculation(c calculatorpb.CalculatorServiceClient) {
 	log.Printf("Average: %v", res)
 }
 
+func doBiDiStreaming(c calculatorpb.CalculatorServiceClient) {
+	log.Println("Starting to do a FindMax BiDi Streaming Rpc")
+	stream, err := c.FindMaximum(context.Background())
+
+	if err != nil {
+		log.Fatalf("Error while opening stream and calling FindMaximum: %v", err)
+	}
+	waitc := make(chan struct{})
+
+	//send
+	go func() {
+		numbers := []int64{4, 4, 5, 6, 7, 8, 91}
+		for _, number := range numbers {
+			fmt.Printf("Number sent: %v", number)
+			stream.Send(&calculatorpb.FindMaximumRequest{
+				PrimeNumber: number,
+			})
+			time.Sleep(1 * time.Second)
+		}
+		stream.CloseSend()
+
+	}()
+	//receive
+
+	go func() {
+		for {
+			res, err := stream.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				log.Fatalf("Problem while reading: %v", err)
+			}
+			maximum := res.GetMaxNumber()
+			fmt.Printf("Received a new maximum of...%v", maximum)
+		}
+		close(waitc)
+	}()
+	<-waitc
+}
+
 func main() {
 	fmt.Println("Caclulator CLient")
 
@@ -79,5 +120,6 @@ func main() {
 	c := calculatorpb.NewCalculatorServiceClient(conn)
 	//doUnary(c)
 	//doPrimeNumberDecompositionStreaming(c)
-	doAverageCalculation(c)
+	//doAverageCalculation(c)
+	doBiDiStreaming(c)
 }
