@@ -26,24 +26,32 @@ int32 prime_number = 1;
 }
 
 message ComputeAverageRequest {
-	int64 primenumber = 1;
+int64 primenumber = 1;
 }
 
 message ComputeAverageResponse {
-	double result = 1;
+double result = 1;
 }
 
 message FindMaximumRequest {
-	int64 prime_number = 1;
+int64 prime_number = 1;
 }
 
 message FindMaximumResponse {
-	int64 max_number = 1;
+int64 max_number = 1;
 }
 
+message SquareRootRequest {
+	int32 number = 1;
+}
+
+message SquareRootResponse {
+	double number_root = 1;
+}
 service CalculatorService {
 rpc Sum(SumRequest) returns (SumResponse) {};
 rpc PrimeNumberDecomposition(PrimeNumberDecompositionRequest) returns (stream PrimeNumberDecompositionResponse) {};
 rpc ComputeAverage(stream ComputeAverageRequest) returns (ComputeAverageResponse) {};
 rpc FindMaximum(stream FindMaximumRequest) returns (stream FindMaximumResponse) {};
+rpc SquareRoot(SquareRootRequest) returns (SquareRootResponse) {};
 }

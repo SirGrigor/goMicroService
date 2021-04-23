@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"goMicroService/calculator/calculatorpb"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"io"
 	"log"
 	"time"
@@ -109,6 +111,36 @@ func doBiDiStreaming(c calculatorpb.CalculatorServiceClient) {
 	<-waitc
 }
 
+func doErrorUnary(c calculatorpb.CalculatorServiceClient) {
+	fmt.Println("Start to do a SquareRoot Unary RPC")
+
+	//correct call
+	doErrorCall(c, 10)
+
+	//error call
+	doErrorCall(c, -2)
+
+}
+
+func doErrorCall(c calculatorpb.CalculatorServiceClient, number int32) {
+	res, err := c.SquareRoot(context.Background(), &calculatorpb.SquareRootRequest{Number: number})
+
+	if err != nil {
+		respErr, ok := status.FromError(err)
+		if ok {
+			//user ok
+			fmt.Println(respErr.Message())
+			fmt.Println(respErr.Code())
+			if respErr.Code() == codes.InvalidArgument {
+				fmt.Println("We sent a negative number!")
+			}
+		} else {
+			log.Fatalf("Big error calling Square rootL %v", err)
+		}
+	}
+	fmt.Printf("Result of square root of %v: %v", number, res.GetNumberRoot())
+}
+
 func main() {
 	fmt.Println("Caclulator CLient")
 
@@ -121,5 +153,6 @@ func main() {
 	//doUnary(c)
 	//doPrimeNumberDecompositionStreaming(c)
 	//doAverageCalculation(c)
-	doBiDiStreaming(c)
+	//doBiDiStreaming(c)
+	doErrorUnary(c)
 }
