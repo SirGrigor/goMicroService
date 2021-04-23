@@ -129,13 +129,15 @@ func doErrorCall(c calculatorpb.CalculatorServiceClient, number int32) {
 		respErr, ok := status.FromError(err)
 		if ok {
 			//user ok
-			fmt.Println(respErr.Message())
+			fmt.Printf("Error message from server: %v", respErr.Message())
 			fmt.Println(respErr.Code())
 			if respErr.Code() == codes.InvalidArgument {
 				fmt.Println("We sent a negative number!")
+				return
 			}
 		} else {
 			log.Fatalf("Big error calling Square rootL %v", err)
+			return
 		}
 	}
 	fmt.Printf("Result of square root of %v: %v", number, res.GetNumberRoot())

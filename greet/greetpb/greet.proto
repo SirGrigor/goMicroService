@@ -48,4 +48,6 @@ rpc GreetManyTimes(GreetManyTimesRequest) returns (stream GreatManyTimesResponse
 rpc LongGreet(stream LongGreetRequest) returns (LongGreetResponse) {};
 // BIDI streaming
 rpc GreetEveryone(stream GreetEveryoneRequest) returns (stream GreetEveryoneResponse) {};
+
+rpc GreetWithDeadLine(GreetWithDeadlineRequest) returns (GreetResponse) {};
 }
